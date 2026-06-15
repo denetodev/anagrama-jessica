@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>uma pista para você</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Quicksand:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FAF1E4;
+      --burgundy: #7A1F2B;
+      --burgundy-dark: #5C1620;
+      --gold: #D4A857;
+      --gold-light: #E9C988;
+      --ink: #2B2622;
+      --blush: #F4D9CF;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Quicksand', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream);
+      background-image:
+        radial-gradient(circle at 18% 18%, rgba(212, 168, 87, 0.14) 0, transparent 45%),
+        radial-gradient(circle at 85% 82%, rgba(122, 31, 43, 0.08) 0, transparent 50%);
+      font-family: var(--font-body);
+      color: var(--ink);
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(122, 31, 43, 0.14);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--burgundy), var(--gold));
+    }
+
+    .eyebrow {
+      font-family: var(--font-display);
+      letter-spacing: 0.28em;
+      font-size: 12px;
+      color: var(--burgundy);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1,
+    h2 {
+      font-family: var(--font-display);
+      letter-spacing: 0.04em;
+      margin: 0 0 14px;
+      color: var(--burgundy);
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    h2 {
+      font-size: 24px;
+      text-align: center;
+    }
+
+    p {
+      line-height: 1.35;
+      margin: 0 0 16px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: fade .4s ease;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .lucky {
+      text-align: center;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      color: var(--burgundy);
+      font-size: 22px;
+      margin: 8px 0 24px;
+    }
+
+    .btn {
+      font-family: var(--font-display);
+      letter-spacing: 0.06em;
+      font-size: 15px;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      cursor: pointer;
+      background: var(--burgundy);
+      color: #fff;
+      transition: transform .15s, background .2s;
+    }
+
+    .btn:hover {
+      background: var(--burgundy-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--burgundy);
+      border: 2px solid var(--burgundy);
+    }
+
+    .btn.secondary:hover {
+      background: var(--blush);
+    }
+
+    .btn:focus-visible,
+    .tile:focus-visible,
+    input:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    /* puzzle layout */
+    #puzzle-area {
+      margin: 24px 0;
+    }
+
+    .puzzle-word {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .puzzle-sep-line {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--burgundy);
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .puzzle-word .tile:nth-child(odd) {
+      transform: rotate(-2deg);
+    }
+
+    .puzzle-word .tile:nth-child(even) {
+      transform: rotate(2deg);
+    }
+
+    .puzzle-word .tile.fillable:hover {
+      transform: translateY(-2px) rotate(0);
+    }
+
+    .tile {
+      width: 38px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 20px;
+      border-radius: 6px;
+      user-select: none;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: var(--burgundy-dark);
+      border: 2px solid var(--burgundy-dark);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+      transition: transform .15s;
+    }
+
+    .tile.fixed {
+      background: var(--blush);
+      color: var(--burgundy);
+      cursor: default;
+    }
+
+    .tile.empty {
+      background: var(--cream);
+      border-style: dashed;
+      color: transparent;
+    }
+
+    .tile.fillable {
+      cursor: pointer;
+    }
+
+    .tile.fillable:hover {
+      transform: translateY(-2px);
+    }
+
+    .bank {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 56px;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: var(--cream);
+      border-radius: 14px;
+    }
+
+    .bank .tile {
+      cursor: pointer;
+    }
+
+    .bank .tile:hover {
+      transform: translateY(-3px) rotate(0);
+    }
+
+    .feedback {
+      text-align: center;
+      font-weight: 600;
+      min-height: 0;
+      margin-top: 0;
+    }
+
+    .feedback.error {
+      color: var(--burgundy);
+    }
+
+    .feedback.success {
+      color: #3a7d44;
+    }
+
+    .hint {
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--blush);
+      border-radius: 14px;
+      font-size: 14px;
+      display: none;
+      line-height: 1.6;
+    }
+
+    .hint.visible {
+      display: block;
+    }
+
+    input[type="number"] {
+      font-family: var(--font-body);
+      font-size: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 2px solid var(--gold);
+      width: 100%;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .final-text {
+      font-size: 17px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .paws {
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: 12px;
+      margin-top: 24px;
+      opacity: 0.6;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <!-- <div class="eyebrow">peça 03</div> -->
+
+    <!-- Tela 1: introdução -->
+    <section class="screen active" id="screen-intro">
+      <h1>oi, <span id="nome-placeholder">Jéssica</span> 🐾</h1>
+      <p>Antes de continuar, deixa eu te explicar uma coisa: você sabe o que é um <strong
+          style="color: var(--burgundy); font-weight: bolder;">anagrama</strong>?</p>
+      <p>É quando a gente embaralha as letras de uma palavra (ou frase) e, escondida nessa bagunça toda, tem outra coisa
+        esperando pra ser descoberta. Aqui embaixo tem uma frase bem familiar pra você, só que fora de ordem. Algumas
+        letrinhas já estão no lugar certo, de bônus.</p>
+      <p class="lucky">boa sorte! 🍀</p>
+      <div class="actions">
+        <button class="btn" onclick="goTo('puzzle')">vamos lá →</button>
+      </div>
+    </section>
+
+    <!-- Tela 2: anagrama -->
+    <section class="screen" id="screen-puzzle">
+      <h2>desvende a frase</h2>
+      <div id="puzzle-area"></div>
+      <div class="bank" id="bank-row"></div>
+      <div class="actions">
+        <button class="btn secondary" onclick="clearTiles()">limpar</button>
+        <button class="btn" onclick="checkPuzzle()">verificar</button>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" onclick="toggleHint()">preciso de uma dica 🍫</button>
+      </div>
+      <div class="hint" id="hint-box">
+        A peça 02 veio com um presente bem doce... dá uma olhada no nome dele 🐱
+      </div>
+      <div class="feedback" id="puzzle-feedback"></div>
+    </section>
+
+    <!-- Tela 3: vidas do gato -->
+    <section class="screen" id="screen-cat">
+      <h2>🐱 mais uma coisinha...</h2>
+      <p style="text-align:center; font-size:18px;">Quantas vidas tem o gato?</p>
+      <input type="number" id="cat-input" inputmode="numeric" placeholder="?">
+      <div class="actions">
+        <button class="btn" onclick="checkCat()">verificar</button>
+      </div>
+      <div class="feedback" id="cat-feedback"></div>
+    </section>
+
+    <!-- Tela 4: revelação final -->
+    <section class="screen" id="screen-final">
+      <p class="final-text">Assim como as outras peças, esta também está esfriando...<br><br>e você já sabe quantas
+        vidas o gato tem. 😉</p>
+      <div class="paws">🐾 🐾 🐾</div>
+    </section>
+  </div>
+
+  <script>
+    // ====== CONFIGURÁVEL ======
+    const NOME = "Jéssica";                  // nome exibido na tela 1
+    const COMBINED = "LINGUAGATO".split(''); // LÍNGUA + GATO, sem espaço/acento
+    const REVEALED = [1, 5, 8];              // índices (0-9) já revelados: I, A, T
+    // ===========================
+
+    document.getElementById('nome-placeholder').textContent = NOME;
+
+    let slots = COMBINED.map((letra, i) => REVEALED.includes(i) ? letra : null);
+    let bank = COMBINED
+      .map((letra, i) => ({ letra, i }))
+      .filter(item => !REVEALED.includes(item.i));
+
+    // embaralha o banco de letras
+    for (let i = bank.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [bank[i], bank[j]] = [bank[j], bank[i]];
+    }
+
+    function buildTile(i) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      if (REVEALED.includes(i)) {
+        tile.classList.add('fixed');
+        tile.textContent = slots[i];
+      } else if (slots[i]) {
+        tile.classList.add('fillable');
+        tile.textContent = slots[i];
+        tile.tabIndex = 0;
+        tile.setAttribute('role', 'button');
+        tile.setAttribute('aria-label', 'remover letra ' + slots[i]);
+        tile.onclick = () => returnToBank(i);
+        tile.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') returnToBank(i); };
+      } else {
+        tile.classList.add('empty');
+        tile.textContent = '_';
+      }
+      return tile;
+    }
+
+    function renderPuzzle() {
+      const area = document.getElementById('puzzle-area');
+      area.innerHTML = '';
+
+      // linha 1: LÍNGUA (índices 0–5)
+      const row1 = document.createElement('div');
+      row1.className = 'puzzle-word';
+      for (let i = 0; i < 6; i++) row1.appendChild(buildTile(i));
+      area.appendChild(row1);
+
+      // separador
+      const sep = document.createElement('div');
+      sep.className = 'puzzle-sep-line';
+      sep.textContent = '– DE –';
+      area.appendChild(sep);
+
+      // linha 2: GATO (índices 6–9)
+      const row2 = document.createElement('div');
+      row2.className = 'puzzle-word';
+      for (let i = 6; i < 10; i++) row2.appendChild(buildTile(i));
+      area.appendChild(row2);
+
+      // banco de letras
+      const bankRow = document.getElementById('bank-row');
+      bankRow.innerHTML = '';
+      bank.forEach((item, idx) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.textContent = item.letra;
+        tile.tabIndex = 0;
+        tile.setAttribute('role', 'button');
+        tile.setAttribute('aria-label', 'colocar letra ' + item.letra);
+        tile.onclick = () => placeFromBank(idx);
+        tile.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') placeFromBank(idx); };
+        bankRow.appendChild(tile);
+      });
+    }
+
+    function placeFromBank(bankIdx) {
+      const empty = slots.findIndex((v, i) => v === null && !REVEALED.includes(i));
+      if (empty === -1) return;
+      slots[empty] = bank[bankIdx].letra;
+      bank.splice(bankIdx, 1);
+      document.getElementById('puzzle-feedback').textContent = '';
+      renderPuzzle();
+    }
+
+    function returnToBank(slotIdx) {
+      bank.push({ letra: slots[slotIdx], i: slotIdx });
+      slots[slotIdx] = null;
+      document.getElementById('puzzle-feedback').textContent = '';
+      renderPuzzle();
+    }
+
+    function clearTiles() {
+      for (let i = 0; i < 10; i++) {
+        if (!REVEALED.includes(i) && slots[i]) {
+          bank.push({ letra: slots[i], i });
+          slots[i] = null;
+        }
+      }
+      document.getElementById('puzzle-feedback').textContent = '';
+      renderPuzzle();
+    }
+
+    function checkPuzzle() {
+      const fb = document.getElementById('puzzle-feedback');
+      if (slots.includes(null)) {
+        fb.className = 'feedback error';
+        fb.textContent = 'ainda faltam letras...';
+        return;
+      }
+      if (slots.join('') === COMBINED.join('')) {
+        fb.className = 'feedback success';
+        fb.textContent = 'isso! 🎉';
+        setTimeout(() => goTo('cat'), 900);
+      } else {
+        fb.className = 'feedback error';
+        fb.textContent = 'ainda não é isso, tenta de novo';
+      }
+    }
+
+    function toggleHint() {
+      document.getElementById('hint-box').classList.toggle('visible');
+    }
+
+    function checkCat() {
+      const val = document.getElementById('cat-input').value.trim();
+      const fb = document.getElementById('cat-feedback');
+      if (val === '7') {
+        fb.className = 'feedback success';
+        fb.textContent = 'exatamente 🐾';
+        setTimeout(() => goTo('final'), 800);
+      } else {
+        fb.className = 'feedback error';
+        fb.textContent = 'hmm... pensa nos gatos 🐱';
+      }
+    }
+
+    function goTo(screen) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + screen).classList.add('active');
+    }
+
+    renderPuzzle();
+  </script>
+</body>
+
+</html>
